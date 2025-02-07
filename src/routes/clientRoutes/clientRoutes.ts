@@ -1,5 +1,5 @@
 import { Request, Response, Router } from "express";
-import Activity_Queue from "request_queuer/Activity_Queue";
+import Activity_Queue from "activity_queuer/Activity_Queue";
 
 export default (router: Router) => {
     router.put("/somar1", (req: Request, res: Response) => {
