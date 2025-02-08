@@ -1,10 +1,10 @@
-import Queue_module from "../models/queue_module/queue_module";
+import View_module from "../models/view_module";
 
 
 export default class Activity_Queue {
     private static _instance: Activity_Queue
     private constructor() {}
-    private list: Queue_module[] = []
+    private list: View_module[] = []
 
     static __GET__() {
         if (!Activity_Queue._instance) {
@@ -13,7 +13,7 @@ export default class Activity_Queue {
         return Activity_Queue._instance
     }
     
-    addActivity(activity: Queue_module) {
+    addActivity(activity: View_module) {
         this.list.push(activity)
     }
 
