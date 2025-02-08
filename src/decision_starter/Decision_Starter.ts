@@ -21,7 +21,7 @@ class Decision_Starter {
         this.isRunning = true;
 
         const current_request = Activity_Queue.__GET__().getActivity();
-        // start decision
+        // TODO: start decision
 
         this.run();
     }

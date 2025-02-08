@@ -5,7 +5,7 @@ import compression from "compression";
 import cors from "cors";
 import logger from "morgan";
 import routes from "../routes";
-
+ 
 
 export class SERVER {
     private static instance: SERVER | undefined;
