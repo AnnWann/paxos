@@ -1,16 +1,15 @@
 import Server_message from "./server_message";
+import View_module from "./view_module";
 
 type Prepare = {
-  Prepare: Prepare_Message,
-  Prepare_oks: Prepare_oks[],
+  Prepare_message: Prepare_Message,
+  Promises: Promise[],
 }
 
-type Prepare_Message = Server_message & {
-
+type Prepare_Message = Server_message & { 
 }
 
-type Prepare_oks = Server_message & {
-  
+type Promise = Server_message & {
 }
 
-export default Prepare;
+export {Prepare, Prepare_Message, Promise};

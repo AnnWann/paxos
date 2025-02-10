@@ -1,11 +1,22 @@
+import Acceptor from "decision/acceptor/acceptor";
+import __GLOBAL__ from "decision/GLOBAL";
+import Learner from "decision/learner/learner";
+import disk_write from "models/disk_writer_type";
 
-
-async function writeToFile(path: string, data: Object): Promise<void> {
+async function writeJsonToFile(path: string, data: disk_write): Promise<void> {
     const fs = require('fs');
-    fs.writeToFile(path, data);
+    fs.writeFile(path, JSON.stringify(data));
 }
 
-function readFromFile(path: string): Object {
+function readJsonFromFile(path: string): disk_write {
     const fs = require('fs');
-    return fs.readFromFile(path);
+    return JSON.parse(fs.readFromFile(path));
+}
+
+function buildCurrentState(): disk_write {
+    return {
+        GLOBAL: __GLOBAL__.getInstance(),
+        ACCEPTOR: Acceptor.__GET__(),
+        LEARNER: Learner.__GET__()
+    }
 }
