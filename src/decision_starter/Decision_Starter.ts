@@ -1,7 +1,8 @@
 import Activity_Queue from "activity_queuer/Activity_Queue";
+import runDecision from "decision/decisionRunner";
 
 
-class Decision_Starter {
+export class Decision_Starter {
     private static _instance: Decision_Starter;
     private isRunning: boolean = false;
   
@@ -11,6 +12,7 @@ class Decision_Starter {
         if (this._instance == null) {
             this._instance = new Decision_Starter();
         }
+        this._instance.run();
         return this._instance;
     }
 
@@ -18,10 +20,13 @@ class Decision_Starter {
         while (this.isRunning) {
           setTimeout(() => {}, 300);
         }
-        this.isRunning = true;
-
         const current_request = Activity_Queue.__GET__().getActivity();
-        // TODO: start decision
+        if (current_request == null) {
+          this.run();
+        }
+        
+        this.isRunning = true;
+        runDecision(current_request);
 
         this.run();
     }
