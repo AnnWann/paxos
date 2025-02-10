@@ -1,5 +1,5 @@
 import  {Global_ordering, global_slots } from "models/global_ordering";
-import {Prepare, Prepare_Message} from "models/prepare";
+import {Prepare} from "models/prepare";
 import Server_message from "models/server_message";
 import Server_state from "models/server_state";
 import { SERVER } from "server/server";
@@ -18,6 +18,7 @@ export default class __GLOBAL__ {
             My_server_id: SERVER.GET_INSTANCE().PORT,
             State: "LEADER_ELECTION"
         };
+        this.neighbors = [Number(process.env.PORT1), Number(process.env.PORT2), Number(process.env.PORT3)].filter((v) => v != this.server_state.My_server_id);
     }
 
     public static getInstance() {
@@ -32,6 +33,6 @@ export default class __GLOBAL__ {
     Last_Attempted: Server_message;
     global_ordering: Global_ordering;
     server_state: Server_state;
-    neighbors: Array<number> = [3001, 3002];
+    neighbors: Array<number> 
     ip = "http://localhost/";
 }

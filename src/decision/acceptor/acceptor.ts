@@ -6,13 +6,19 @@ import Server_message from "models/server_message";
 
 
 export default class Acceptor {
-  private static _instance = new Acceptor();
+  private static _instance: Acceptor = null;
 
   lastPromised: Prepare_Message = null;
   accept_messages: Server_message[] = [];
 
   public static __GET__() {
+    if (!this._instance)
+      this._instance = new Acceptor();
     return this._instance;
+  }
+
+  public static __DESTROY__() {
+    this._instance = null;
   }
 
   private constructor() {

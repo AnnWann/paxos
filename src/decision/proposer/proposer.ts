@@ -7,15 +7,20 @@ import View_module from "models/view_module";
 import { SERVER } from "server/server";
 
 
-class Proposer { 
-  private static _instance = new Proposer();
+export default class Proposer { 
+  private static _instance: Proposer = null;
 
   private constructor() {}
 
   public static __GET__() {
+    if (!this._instance)
+      this._instance = new Proposer();
     return this._instance;
   }
 
+  public static __DESTROY__() {
+    this._instance = null;
+  }
 
   Prepare(view: View_module) {
     view.time_stamp = __GLOBAL__.getInstance().global_ordering.Last_Proposed + 1;
