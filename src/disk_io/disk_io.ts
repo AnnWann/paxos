@@ -20,3 +20,5 @@ function buildCurrentState(): disk_write {
         LEARNER: Learner.__GET__()
     }
 }
+
+export { writeJsonToFile, readJsonFromFile, buildCurrentState }
