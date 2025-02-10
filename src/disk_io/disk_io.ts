@@ -21,4 +21,4 @@ function buildCurrentState(): disk_write {
     }
 }
 
-export { writeJsonToFile, readJsonFromFile, buildCurrentState }
+export { writeJsonToFile, readJsonFromFile, buildCurrentState };

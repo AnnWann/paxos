@@ -1,3 +1,4 @@
+import Server_message from "./server_message"
 import View_module from "./view_module"
 
 
@@ -9,8 +10,8 @@ type Global_ordering = {
 
 
 type global_slots = {
-  Proposal: Proposal, 
-  Accepts: Map<number, Accept>,
+  Proposal: Server_message, 
+  Accepts: Map<number, Server_message>,
   Globally_Ordered_Update: View_module
 }
 

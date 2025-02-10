@@ -7,7 +7,8 @@ export default (router: Router) => {
             {
                 req,
                 res,
-                f: (x: number) => x + 1
+                f: (x: number) => x + 1,
+                time_stamp: 0
             }
         )
     });
@@ -17,7 +18,8 @@ export default (router: Router) => {
             {
                 req,
                 res,
-                f: (x: number) => x - 1
+                f: (x: number) => x - 1,
+                time_stamp: 0
             }
         )
     });
