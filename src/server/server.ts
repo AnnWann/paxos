@@ -10,7 +10,7 @@ import routes from "../routes";
 export class SERVER {
     private static instance: SERVER | undefined;
     private server: http.Server;
-    private PORT: number | undefined;
+    PORT: number | undefined;
     IsRunning: boolean = false;
 
     static GET_INSTANCE() {
