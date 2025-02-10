@@ -28,4 +28,16 @@ export default (router: Router) => {
     const message = req.body as Prepare_Message;
     Learner.__GET__().learn_messages.push(message);
   });
+  router.put("/Promise", (req, res) => {
+    const message = req.body as Prepare_Message; 
+    __GLOBAL__.getInstance().Prepare.Promises.push(message);
+  });
+  router.put("/Accept", (req, res) => {
+    const message = req.body as Prepare_Message;
+    Acceptor.__GET__().accept_messages.push(message);
+  });
+  router.put("/Learn", (req, res) => {
+    const message = req.body as Prepare_Message;
+    Learner.__GET__().learn_messages.push(message);
+  });
 }
