@@ -5,15 +5,15 @@ import compression from "compression";
 import cors from "cors";
 import logger from "morgan";
 import routes from "../routes";
-
+ 
 
 export class SERVER {
     private static instance: SERVER | undefined;
     private server: http.Server;
-    private PORT: number | undefined;
+    ID: number | undefined;
     IsRunning: boolean = false;
 
-    static GET_INSTANCE() {
+    static __GET__() {
         if(!this.instance) {
             this.instance = new SERVER();
             return this.instance;
@@ -21,17 +21,17 @@ export class SERVER {
     }
 
     setPort(PORT: number): SERVER {
-        this.PORT = PORT;
+        this.ID = PORT;
         return this;
     }
 
     run(): SERVER {
-        if(!this.PORT) throw new Error("Port not set");
+        if(!this.ID) throw new Error("Port not set");
         if(!this.server) throw new Error("Server not set");
         if(this.IsRunning) return this;
-        this.server.listen(this.PORT, () => {
-            console.log(`Server is running on port ${this.PORT}`);
-            console.log(`address: http://localhost:${this.PORT}`);
+        this.server.listen(this.ID, () => {
+            console.log(`Server is running on port ${this.ID}`);
+            console.log(`address: http://localhost:${this.ID}`);
         });
         this.IsRunning = true;
         return this;
@@ -42,7 +42,7 @@ export class SERVER {
             this.server.close();
         }
         this.IsRunning = false;
-        this.PORT = undefined;
+        this.ID = undefined;
         console.log("Server closed");
         return this;
     }
