@@ -1,10 +1,10 @@
 import { Request, Response } from 'express'
 
-type View_module = {
+type client_update = {
   req: Request
   res: Response
   f: (x: number) => number
   time_stamp: number
 }
 
-export default View_module
+export default client_update

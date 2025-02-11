@@ -1,14 +1,13 @@
-import { broadcast } from "decision/broadcast";
 import __GLOBAL__ from "decision/GLOBAL";
-import Server_message from "models/server_message";
-import View_module from "models/view_module";
-import current_view from "view";
+import { Proposal } from "models/prepare";
+import Current_value from "current_value";
+import { onUpdate } from "decision/decisionRunner";
 
 
 export default class Learner {
   private static _instance: Learner = null;
 
-  learn_messages: Server_message[] = [];
+  learn_messages: Proposal[] = [];
 
   public static __GET__() {
     if  (!this._instance)
@@ -23,14 +22,20 @@ export default class Learner {
   private constructor() {}
 
   Execute() {
-    const message = GetMajority(this.learn_messages);
-    __GLOBAL__.getInstance().Last_Installed = message;
-    current_view.__GET__().set_current_view(__GLOBAL__.getInstance().Last_Installed.view.f);
+    const proposal = GetMajority(this.learn_messages);
+    __GLOBAL__.__GET__().Last_Installed = proposal.seq;
+    Current_value.__GET__().set_current_value(proposal.update.f);
+
+    onUpdate(proposal)
+  }
+
+  recoverState(state: Learner) {
+    this.learn_messages = state.learn_messages;
   }
 }
 
-function GetMajority(learn_messages: Server_message[]) {
-  const views = new Map<Server_message, number>();
+function GetMajority(learn_messages: Proposal[]) {
+  const views = new Map<Proposal, number>();
 
   learn_messages.forEach((learn_message) => {
     if (views.has(learn_message)) {

@@ -4,3 +4,12 @@ type Server_state = {
 }
 
 export default Server_state
+
+
+
+
+/**
+ * "LEADER_ELECTION" -> O servidor tentando instalar um novo lider
+ * "REG_LEADER" -> O lider completa a fase de Prepare
+ * "REG_NONLEADER" -> O não-lider envia os updates do cliente para o lider para sequenciamento e responde a propostas feitas pelo lider
+ */

@@ -1,63 +1,117 @@
-import View_module from "models/view_module";
+import client_update from "models/view_module";
 import Proposer from "./proposer/proposer";
 import Acceptor from "./acceptor/acceptor";
 import Learner from "./learner/learner";
 import { buildCurrentState, writeJsonToFile } from "disk_io/disk_io";
 import __GLOBAL__ from "./GLOBAL";
-import Server_message from "models/server_message";
+import { Prepare, Promise, Proposal } from "models/prepare";
+import Current_value from "current_value";
+import { Decision_Starter } from "decision_starter/Decision_Starter";
+
+async function runPrepare(update: client_update) {
+  const p = Proposer.__GET__();
+  Acceptor.__GET__();
+  Learner.__GET__();
 
 
-export default async function runDecision(view: View_module) {
-
-  // Prepare
-  const p = Proposer.__GET__() // Inicializa Proposer
-  p.Prepare(view); // Envia mensagem de Prepare para todos os servidores 
-  writeJsonToFile("current_state.json", buildCurrentState()); // Escreve o estado atual em um arquivo
-
-  const a = Acceptor.__GET__() // Inicializa Acceptor que já promete a mensagem de Prepare de p
-  writeJsonToFile("current_state.json", buildCurrentState()); // Escreve o estado atual em um arquivo
-
-  setTimeout(() => {}, 100); // Espera um intervalo para receber as mensagens de Prepare de pi e quando recebe retorna sua promesa mais recente para pi. 
-  writeJsonToFile("current_state.json", buildCurrentState()); // Escreve o estado atual em um arquivo
-
-  // Accept
-  p.Accept(); // Envia mensagem de Accept para todos os servidores
-  writeJsonToFile("current_state.json", buildCurrentState()); // Escreve o estado atual em um arquivo
-
-  setTimeout(() => {}, 100); // Espera um intervalo para receber as mensagens de Accept de pi e quando recebe retorna a mensagem de Accept mais recente para pi.
-  writeJsonToFile("current_state.json", buildCurrentState()); // Escreve o estado atual em um arquivo
-
-  // Learn
-  const l = Learner.__GET__() // Inicializa Learner
-  writeJsonToFile("current_state.json", buildCurrentState()); // Escreve o estado atual em um arquivo
-
-  a.Learn(); // Envia mensagem de Learn para todos os servidores
-  writeJsonToFile("current_state.json", buildCurrentState()); // Escreve o estado atual em um arquivo
-
-  setTimeout(() => {}, 100); // Espera um intervalo para receber as mensagens de Learn de pi e quando recebe retorna a mensagem de Learn mais recente para pi.
-  writeJsonToFile("current_state.json", buildCurrentState()); // Escreve o estado atual em um arquivo
-
-  l.Execute(); // Executa a mensagem de Learn mais recente
-  writeJsonToFile("current_state.json", buildCurrentState()); // Escreve o estado atual em um arquivo
-
-  __GLOBAL__.getInstance().global_ordering.Last_Proposed = view.time_stamp; // Atualiza o Last_Proposed
-  const accepts = new Map<number, Server_message>();
-  l.learn_messages.forEach((learn_message) => {
-    accepts.set(learn_message.server_id, learn_message);
-  });
-
-  __GLOBAL__.getInstance().global_ordering.Global_History
-    .set(
-      view.time_stamp, 
-      {Proposal: null, 
-        Accepts: accepts,
-      Globally_Ordered_Update: view}); // Adiciona a view ao Global_History
-
-  writeJsonToFile("current_state.json", buildCurrentState()); // Escreve o estado atual em um arquivo
-
-  Proposer.__DESTROY__(); // Destrói Proposer
-  Acceptor.__DESTROY__(); // Destrói Acceptor
-  Learner.__DESTROY__(); // Destrói Learner
-
-  writeJsonToFile("current_state.json", buildCurrentState()); // Escreve o estado atual em um arquivo
+  p.Prepare(update);
+  writeJsonToFile("current_state.json", buildCurrentState());
 }
+
+async function onPrepare(prepare: Prepare) {
+  Acceptor.__GET__().Promise(prepare);
+  __GLOBAL__.__GET__().state = "REG_NONLEADER";
+  __GLOBAL__.__GET__().Prepare = prepare;
+  writeJsonToFile("current_state.json", buildCurrentState());
+
+  Decision_Starter.__GET__().isRunning = true;
+  Decision_Starter.__GET__().timeout = 200;
+  Decision_Starter.__GET__().skip = true;
+  
+}
+
+async function onPromise(promise: Promise) {
+  __GLOBAL__.__GET__().Prepare_Phase.Promises.set(promise.server_id, promise);
+  const promises = __GLOBAL__.__GET__().Prepare_Phase.Promises;
+  if (promises.size <= (__GLOBAL__.__GET__().neighbors.length + 1)/2)
+    return;
+
+  Proposer.__GET__().Accept();
+
+  __GLOBAL__.__GET__().state = "REG_NONLEADER";
+  writeJsonToFile("current_state.json", buildCurrentState());
+}
+
+async function onAccept(proposal: Proposal) {
+  const a = Acceptor.__GET__();
+  a.proposals.push(proposal);
+
+  const proposals = a.proposals;
+  if (proposals.length <= (__GLOBAL__.__GET__().neighbors.length + 1)/2)
+    return;
+
+  a.Learn();
+  writeJsonToFile("current_state.json", buildCurrentState());
+}
+
+async function onLearn(accept: Proposal) {
+  const l = Learner.__GET__();
+  l.learn_messages.push(accept);
+
+  if (l.learn_messages.length <= (__GLOBAL__.__GET__().neighbors.length + 1)/2)
+    return;
+
+  l.Execute();
+  writeJsonToFile("current_state.json", buildCurrentState());
+
+  Decision_Starter.__GET__().isRunning = false;
+}
+
+async function onUpdate(proposal: Proposal) {
+  
+  const global_ordering = __GLOBAL__.__GET__().global_ordering;
+
+  global_ordering.Last_Proposed = proposal.seq;
+
+  const AcceptsMap = new Map<number, Proposal>();
+  Learner.__GET__().learn_messages.forEach((learn_message) => {
+    AcceptsMap.set(learn_message.server_id, learn_message);
+  });
+  global_ordering.Global_History.set(proposal.seq, {
+    Proposal: proposal,
+    Accepts: AcceptsMap,
+    Globally_Ordered_Update: proposal.update
+  })
+
+  __GLOBAL__.__GET__().global_ordering = global_ordering;
+  
+  advance_aru();
+
+  const response = {
+    server_id: __GLOBAL__.__GET__().id,
+    value: Current_value.__GET__().get_current_value(),
+    seq: proposal.seq
+  }
+
+  proposal.update.res.json(response);
+
+  Proposer.__DESTROY__();
+  Acceptor.__DESTROY__();
+  Learner.__DESTROY__();
+  __GLOBAL__.__GET__().clear();
+  writeJsonToFile("current_state.json", buildCurrentState());
+}
+
+function advance_aru() {
+  let i = __GLOBAL__.__GET__().global_ordering.Local_Aru + 1;
+  while(1) {
+    if(__GLOBAL__.__GET__().global_ordering.Global_History.has(i)) {
+      __GLOBAL__.__GET__().global_ordering.Local_Aru++;
+      i++;
+    } else {
+      return;
+    }
+  }
+}
+
+export { runPrepare, onPrepare, onPromise, onAccept, onLearn, onUpdate}

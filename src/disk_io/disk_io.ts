@@ -15,7 +15,7 @@ function readJsonFromFile(path: string): disk_write {
 
 function buildCurrentState(): disk_write {
     return {
-        GLOBAL: __GLOBAL__.getInstance(),
+        GLOBAL: __GLOBAL__.__GET__(),
         ACCEPTOR: Acceptor.__GET__(),
         LEARNER: Learner.__GET__()
     }

@@ -1,15 +1,27 @@
-import Server_message from "./server_message";
-import View_module from "./view_module";
+import view from "./view";
+import client_update from "./view_module";
 
 type Prepare = {
-  Prepare_message: Prepare_Message,
-  Promises: Promise[],
+  server_id: number,
+  view: view,
+  local_aru: number,
+}
+type Prepare_Phase = {
+  Prepare_message: Prepare,
+  Promises: Map<number, Promise>,
 }
 
-type Prepare_Message = Server_message & { 
+type Promise = { 
+  server_id: number,
+  view: view,
+  data_list: Proposal[],
 }
 
-type Promise = Server_message & {
+type Proposal = {
+  server_id: number,
+  seq: number,
+  update: client_update,
+  view: view,
 }
 
-export {Prepare, Prepare_Message, Promise};
+export {Prepare, Promise, Proposal, Prepare_Phase};

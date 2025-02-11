@@ -1,5 +1,5 @@
-import Server_message from "./server_message"
-import View_module from "./view_module"
+import { Proposal } from "./prepare"
+import client_update from "./view_module"
 
 
 type Global_ordering = {
@@ -10,9 +10,9 @@ type Global_ordering = {
 
 
 type global_slots = {
-  Proposal: Server_message, 
-  Accepts: Map<number, Server_message>,
-  Globally_Ordered_Update: View_module
+  Proposal: Proposal, 
+  Accepts: Map<number, Proposal>,
+  Globally_Ordered_Update: client_update
 }
 
 export {Global_ordering, global_slots}
