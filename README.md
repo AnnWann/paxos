@@ -4,8 +4,7 @@ This program is made as an assignment for the discipline Principles of Fault Tol
 
 ## Authors
 
-Ricardo Sales Rios
-Uaná Gasparim
+Ricardo Sales Rios, Uaná Gasparim
 
 ## Installation
 
