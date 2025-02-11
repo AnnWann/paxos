@@ -19,8 +19,8 @@ Once the .env is created for each server in their respective directories, do `np
 
 Once the servers are running you can send requests using the prefered agent of your choice. As the client, you can do two operations: 
 
-    localhost/port/somar1 -> increases the server value by 1
-    localhost/port/subtrair1 -> decreases the server value by 1
+    localhost:port/somar1 -> increases the server value by 1
+    localhost:port/subtrair1 -> decreases the server value by 1
 
 To run tests do `npm test`. 
 
